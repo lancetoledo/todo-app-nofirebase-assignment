@@ -1,13 +1,24 @@
 import React from 'react'
+import FilterControl from './FilterControl'
 import Task from './Task'
+import { deleteDoc,doc } from 'firebase/firestore'
+import db from '../utils/firebase'
 
 // #10c destructure setTasks,filterStatus,setFilterStatus,filteredTasks
-function TaskList({tasks}) {
+function TaskList({tasks, setTasks, filterStatus, setFilterStatus, filteredTasks, setFilteredTasks}) {
 
     console.log(tasks)
 
     // #12b Create a funciton called clearCompleted that will clear completed Tasks by updating the tasks with the filtered tasks, then reset the filterStatus("all")
-
+    const clearCompleted = () => {
+        // setTasks(tasks.filter((task)=> !task.status))
+        // Firebase utilize deleteDoc()
+        filteredTasks.map(async (item)=> {
+            if(item.status === true) {
+               await deleteDoc(doc(db,"tasks", item.id))
+            }
+        })
+    }
 
     return (
         <div className='todo-items-wrapper'>
@@ -15,9 +26,11 @@ function TaskList({tasks}) {
     
                 {/* #5 pass down tasks and setTasks for later! */}
                 {/* #11 switch tasks.map to filteredTasks.map() */}
-                {tasks.map((item)=> {
+                {filteredTasks.map((item)=> {
                     return <Task 
                                 task = {item}
+                                tasks = {tasks}
+                                setTasks={setTasks}
                             />
                 })}
              
@@ -31,20 +44,15 @@ function TaskList({tasks}) {
                    <p> {tasks.length} items left</p>
                 </div>
 
-              {/* #8 Create a FilterControl component  and pass down filterStatus and setFilterStatus*/}
-                <div className='item-statuses'>
-                    <span>All</span>
-                    <span>Active</span>
-                    <span>Completed</span>
-                </div>
-
-            {/* #9 In FilterControl create a function that onClick the status gets set to the span that was clicked */}
-
+                <FilterControl
+                    filterStatus = {filterStatus}
+                    setFilterStatus = {setFilterStatus}
+                />
 
     
                 <div className='items-clear'>
                     {/* #12a create an onClick that runs a function to clear completed tasks */}
-                    <span>Clear Completed</span>
+                    <span onClick={clearCompleted}>Clear Completed</span>
                 </div>
             </div>
         </div>

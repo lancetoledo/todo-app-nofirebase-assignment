@@ -1,4 +1,6 @@
 import React, { useState } from 'react'
+import { addDoc, collection } from 'firebase/firestore'
+import db from '../utils/firebase'
 
 function TaskInput({tasks, setTasks}) {
 
@@ -16,7 +18,7 @@ function TaskInput({tasks, setTasks}) {
     }
 
     // I need a function that runs when I submit
-    const handleForm = (e) => {
+    const handleForm = async (e) => {
         e.preventDefault()
         // ADD what I put in input to the tasks array
 
@@ -24,23 +26,34 @@ function TaskInput({tasks, setTasks}) {
         // Create an object with whatever I wrote in input as the text:
 
         if(input) {
-            const newTask = {
-                id: createId(tasks),
+            // const newTask = {
+            //     id: createId(tasks),
+            //     text: input.trim(),
+            //     status: false
+            // }
+            // // ADD a new task to the tasks state (add a new task to the data array)
+            // // How do we update the tasks state?
+
+            // // tasks -> [{id:},{text:},{}]
+            // // tasks -> newTask
+
+            // setTasks([newTask,...tasks])
+
+            // // Reset Input
+            // // WHat state do I want to reset?
+            // console.log(input)
+            // setInput('')
+
+            // with Firebase
+            const collectionRef = collection(db, "tasks")
+            const payload = {
                 text: input.trim(),
                 status: false
             }
-            // ADD a new task to the tasks state (add a new task to the data array)
-            // How do we update the tasks state?
 
-            // tasks -> [{id:},{text:},{}]
-            // tasks -> newTask
 
-            setTasks([newTask,...tasks])
-
-            // Reset Input
-            // WHat state do I want to reset?
-            console.log(input)
-            setInput('')
+           await addDoc(collectionRef, payload)
+           setInput('')
         }
 
     }
